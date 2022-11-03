@@ -53,12 +53,17 @@ Usually, the Model class name will be the capitalised table name (single instead
 
 # Model class
 # (in lib/student.rb)
-class Student
+class User
 end
 
-# Repository class
-# (in lib/student_repository.rb)
-class StudentRepository
+class Peep
+end
+
+
+class UserRepository
+end
+
+class PeepRepository
 end
 ```
 
@@ -73,10 +78,12 @@ Define the attributes of your Model class. You can usually map the table columns
 # Model class
 # (in lib/student.rb)
 
-class Student
+class User
+  attr_accessor :id, :handle, :email, :password
+end
 
-  # Replace the attributes by your own columns.
-  attr_accessor :id, :name, :cohort_name
+class Peep
+  attr_accessor :id, :content, :time, :user_id
 end
 
 # The keyword attr_accessor is a special Ruby feature
@@ -103,7 +110,7 @@ Using comments, define the method signatures (arguments and return value) and wh
 # Repository class
 # (in lib/student_repository.rb)
 
-class StudentRepository
+class UserRepository
 
   # Selecting all records
   # No arguments
@@ -116,12 +123,44 @@ class StudentRepository
 
   # Gets a single record by its ID
   # One argument: the id (number)
-  def find(id)
+  # def find(id)
     # Executes the SQL query:
     # SELECT id, name, cohort_name FROM students WHERE id = $1;
 
     # Returns a single Student object.
+  # end
+
+  # Add more methods below for each operation you'd like to implement.
+
+  # def create(student)
+  # end
+
+  # def update(student)
+  # end
+
+  # def delete(student)
+  # end
+end
+
+class PeepRepository
+
+  # Selecting all records
+  # No arguments
+  def all
+    # Executes the SQL query:
+    # SELECT id, name, cohort_name FROM students;
+
+    # Returns an array of Student objects.
   end
+
+  # Gets a single record by its ID
+  # One argument: the id (number)
+  # def find(id)
+    # Executes the SQL query:
+    # SELECT id, name, cohort_name FROM students WHERE id = $1;
+
+    # Returns a single Student object.
+  # end
 
   # Add more methods below for each operation you'd like to implement.
 
@@ -150,17 +189,28 @@ These examples will later be encoded as RSpec tests.
 
 repo = StudentRepository.new
 
-students = repo.all
+context "all method" do
+  it "can list all users" do
+    users = repo.all
+    expect(users[0].id).to eq "1"
+    expect(users[1].handle).to eq "bob2"
+    expect(users[2].email).to eq "clara3@gmail.com"
+    expect(users[2].password).to eq "password3"
+  end
+end
+context "create method" do
+  it "can create a new user" do 
+    user = User.new
+    user.handle = "dave4"
+    user.email = "dave4@gmail.com"
+    user.password = "password4"
+    @repo.create(user)
 
-students.length # =>  2
-
-students[0].id # =>  1
-students[0].name # =>  'David'
-students[0].cohort_name # =>  'April 2022'
-
-students[1].id # =>  2
-students[1].name # =>  'Anna'
-students[1].cohort_name # =>  'May 2022'
+    new_user = repo.all[3]
+    expect(new_user.handle).to eq("dave4")
+    expect(new_user.password).to eq "password4"
+  end
+end
 
 # 2
 # Get a single student
@@ -189,15 +239,15 @@ This is so you get a fresh table contents every time you run the test suite.
 
 # file: spec/student_repository_spec.rb
 
-def reset_students_table
-  seed_sql = File.read('spec/seeds_students.sql')
-  connection = PG.connect({ host: '127.0.0.1', dbname: 'students' })
+def reset_table
+  seed_sql = File.read('spec/chitter_seeds.sql')
+  connection = PG.connect({ host: '127.0.0.1', dbname: 'chitter_test' })
   connection.exec(seed_sql)
 end
 
-describe StudentRepository do
+describe UserRepository do
   before(:each) do 
-    reset_students_table
+    reset_table
   end
 
   # (your tests will go here).
