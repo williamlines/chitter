@@ -1,0 +1,17 @@
+<html>
+  <head></head>
+    <body>
+      <h1>Welcome to Chitter</h1>
+      <h2>Peeps:</h2>
+        <div>
+          <%@peeps.each do |peep|%>
+            <br>
+            <%id = peep.user_id%>
+            <%user = UserRepository.new.find(id)%>
+            <%=user.handle%><br>
+            <%=peep.content%><br>
+            <%=peep.time.split(' ').join(' at ')%><br>
+          <%end%>
+        </div>
+    </body>
+</html>

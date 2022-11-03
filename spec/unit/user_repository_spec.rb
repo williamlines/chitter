@@ -34,4 +34,11 @@ describe UserRepository do
       expect(new_user.password).to eq "password4"
     end
   end
+  context "find method" do
+    it "can find a user by their id" do
+      user = @repo.find(2)
+      expect(user.id).to eq '2'
+      expect(user.handle).to eq 'bob2'
+    end
+  end
 end
