@@ -58,7 +58,7 @@ describe Application do
   end
 
   context "post to '/peep'" do
-    it "can make a new peep" do
+    xit "can make a new peep" do
       response = post(
         '/peep',
         handle: 'clara3',
@@ -98,6 +98,41 @@ describe Application do
       )
       expect(response.status).to be 400
       expect(response.body).to eq ''
+    end
+  end
+  context "log in a user" do
+    it "can show login page" do
+      response = get ('/login')
+      expect(response.status).to eq 200
+      expect(response.body).to include('<form action="/login" method="POST">')
+      expect(response.body).to include('<input type="text" name="handle">')
+      expect(response.body).to include('<input type="password" name="password">')
+    end
+
+    it "can log in a user" do
+      response = post(
+        '/login',
+        handle: 'clara3',
+        password: 'password3'
+      )
+      expect(response.status).to eq 200
+      expect(response.body).to include('Welcome Back clara3!')
+    end
+    it "returns fail message if password is incorrect" do
+      response = post(
+        '/login',
+        handle: 'clara3',
+        password: 'wrongpassword'
+      )
+      expect(response.body).to include('Incorrect handle or password')
+    end
+    it "returns fail message if username is incorrect" do
+      response = post(
+        '/login',
+        handle: 'bkjbnkj',
+        password: 'password3'
+      )
+      expect(response.body).to include('Incorrect handle or password')
     end
   end
 end

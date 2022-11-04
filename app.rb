@@ -1,3 +1,4 @@
+require 'bcrypt'
 require 'sinatra/base'
 require 'sinatra/reloader'
 require_relative './lib/database_connection'
@@ -15,7 +16,7 @@ class Application < Sinatra::Base
     register Sinatra::Reloader
   end
 
-  def time_now(time = Time.now)
+  def time_now(time = Time.parse('2000-01-01 12:30:00'))
     return time.to_s.split(' ').first(2).join(' ')
   end
 
@@ -56,7 +57,6 @@ class Application < Sinatra::Base
       return ''
     end
     
-    @test_time = Time.parse('2000-01-01 12:30:00')
     peep_repo = PeepRepository.new
     new_peep = Peep.new
     
@@ -64,10 +64,25 @@ class Application < Sinatra::Base
     user_id = UserRepository.new.find_by_handle(handle).id
     new_peep.content = params[:peep_content]
     new_peep.user_id = user_id
-    new_peep.time = time_now(@test_time)
+    new_peep.time = time_now
 
     peep_repo.create(new_peep)
     
     return erb(:peep_made)
+  end
+
+  get '/login' do
+    return erb(:login)
+  end
+
+  post '/login' do
+    @user = UserRepository.new.find_by_handle(params[:handle])
+    if @user == nil
+      return erb(:login_fail)
+    elsif BCrypt::Password.new(@user.password) != params[:password]
+      return erb(:login_fail)
+    else
+      return erb(:login_successful)
+    end
   end
 end

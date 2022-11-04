@@ -1,8 +1,8 @@
 TRUNCATE TABLE users, peeps RESTART IDENTITY; 
 
-INSERT INTO users (handle, email, password) VALUES ('adam1', 'adam1@gmail.com', 'password1');
-INSERT INTO users (handle, email, password) VALUES ('bob2', 'bob2@gmail.com', 'password2');
-INSERT INTO users (handle, email, password) VALUES ('clara3', 'clara3@gmail.com', 'password3');
+INSERT INTO users (handle, email, password) VALUES ('adam1', 'adam1@gmail.com', '$2a$12$lK8Xgo79g42LITMQ3ugveeX3PK4ZywMaTOY8WI3kpVlDC46WkrqL.');
+INSERT INTO users (handle, email, password) VALUES ('bob2', 'bob2@gmail.com', '$2a$12$/edoUWpvC3f6f2KlPGW29.E8ZAunAgNO1Jw.iQQominWUMPtobZUa');
+INSERT INTO users (handle, email, password) VALUES ('clara3', 'clara3@gmail.com', '$2a$12$QvTlZ8oxeMFof5wlsDWXJ.uT0lraNcDsCKbtEnLTLO1HRpeH6Buoi');
 
 
 

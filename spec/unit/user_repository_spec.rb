@@ -18,7 +18,7 @@ describe UserRepository do
       expect(users[0].id).to eq "1"
       expect(users[1].handle).to eq "bob2"
       expect(users[2].email).to eq "clara3@gmail.com"
-      expect(users[2].password).to eq "password3"
+      expect(BCrypt::Password.new(users[2].password)).to eq "password3"
     end
   end
   context "create method" do
@@ -31,7 +31,7 @@ describe UserRepository do
 
       new_user = @repo.all[3]
       expect(new_user.handle).to eq("dave4")
-      expect(new_user.password).to eq "password4"
+      expect(BCrypt::Password.new(new_user.password)).to eq 'password4'
     end
   end
   context "find method" do
