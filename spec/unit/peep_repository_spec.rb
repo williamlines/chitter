@@ -29,9 +29,8 @@ describe PeepRepository do
       peep.user_id = "3"
 
       @repo.create(peep)
-      new_peep = @repo.all[5]
+      new_peep = @repo.all[-1]
 
-      expect(new_peep.id).to eq "6"
       expect(new_peep.content).to eq "test peep"
       expect(new_peep.time).to eq "2000-01-01 12:00:00"
       expect(new_peep.user_id).to eq "3"

@@ -32,6 +32,25 @@ class UserRepository
     return user
   end
 
+  def find_by_handle(handle)
+    sql = 'SELECT id, handle, email, password FROM users WHERE handle = $1'
+    params = [handle]
+
+    result = DatabaseConnection.exec_params(sql, params)
+    user = User.new
+    
+    if result.num_tuples.zero?
+      return nil
+    end
+
+    user.id = result[0]["id"]
+    user.handle = result[0]["handle"]
+    user.email = result[0]["email"]
+    user.password = result[0]["password"]
+
+    return user
+  end
+
   def create(user)
     sql = 'INSERT INTO users (handle, email, password) VALUES ($1, $2, $3);'
     params = [user.handle, user.email, user.password]

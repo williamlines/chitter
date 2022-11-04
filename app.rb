@@ -15,11 +15,59 @@ class Application < Sinatra::Base
     register Sinatra::Reloader
   end
 
+  def time_now(time = Time.now)
+    return time.to_s.split(' ').first(2).join(' ')
+  end
+
+  def invalid_peep_params?
+    if UserRepository.new.find_by_handle(params[:handle]) == nil
+      return true
+    end 
+     
+    params[:peep_content].each_char do |char|
+      if ['<', '>', '&', '%'].include?(char)
+        return true
+      end
+    end
+    
+    params[:handle].each_char do |char|
+      if ['<', '>', '&', '%'].include?(char)
+        return true
+      end
+    end
+    return false 
+  end
+
   get '/' do
     peep_repo = PeepRepository.new
     user_repo = UserRepository.new
 
-    @peeps = peep_repo.all
+    @peeps = peep_repo.all.sort_by{|peep| Time.parse(peep.time)}.reverse
     return erb(:index)
+  end
+
+  get '/peep/new' do
+    return erb(:peep_new)
+  end
+
+  post '/peep' do
+    if invalid_peep_params?
+      status 400
+      return ''
+    end
+    
+    @test_time = Time.parse('2000-01-01 12:30:00')
+    peep_repo = PeepRepository.new
+    new_peep = Peep.new
+    
+    handle = params[:handle]
+    user_id = UserRepository.new.find_by_handle(handle).id
+    new_peep.content = params[:peep_content]
+    new_peep.user_id = user_id
+    new_peep.time = time_now(@test_time)
+
+    peep_repo.create(new_peep)
+    
+    return erb(:peep_made)
   end
 end

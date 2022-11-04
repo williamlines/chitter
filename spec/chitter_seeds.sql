@@ -12,3 +12,4 @@ INSERT INTO peeps (content, time, user_id) VALUES ('adams second peep', '2022-11
 INSERT INTO peeps (content, time, user_id) VALUES ('bobs first peep', '2022-11-02 14:00:00', '2');
 INSERT INTO peeps (content, time, user_id) VALUES ('bobs second peep', '2022-11-03 04:00:00', '2');
 INSERT INTO peeps (content, time, user_id) VALUES ('claras first peep', '2022-11-03 15:55:00', '3');
+INSERT INTO peeps (content, time, user_id) VALUES ('claras old peep', '2000-01-01 12:00:00', '3');

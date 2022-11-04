@@ -41,4 +41,11 @@ describe UserRepository do
       expect(user.handle).to eq 'bob2'
     end
   end
+  context "find_by_handle method" do
+    it "can find a user by their handle" do
+      user = @repo.find_by_handle('clara3')
+      expect(user.id).to eq "3"
+      expect(user.email).to eq "clara3@gmail.com"
+    end
+  end
 end
