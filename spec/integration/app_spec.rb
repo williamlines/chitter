@@ -20,6 +20,19 @@ describe Application do
       expect(response.status).to eq 200
       expect(response.body).to include '<html>'
     end
+    it "shows if you are logged in" do
+      post(
+        '/login',
+        handle: 'clara3',
+        password: 'password3'
+      )
+      response = get('/')
+      expect(response.body).to include "Logged in as clara3"
+    end
+    it "shows if you are not logged in" do
+      response = get('/')
+      expect(response.body).to include "Logged in as none, log in?"
+    end
     it "can list all peeps" do
       response = get('/')
       expect(response.body).to include 'adams first peep'
@@ -27,6 +40,8 @@ describe Application do
       expect(response.body).to include '2022-11-02 at 12:00:00'
 
       expect(response.body).to include 'claras first peep'
+      expect(response.body).to include '<h3><a href="/login">Log in</a></h3>'
+      expect(response.body).to include '<a href="/peep/new">New Peep</a>'
     end
     it "shows new peeps first" do
       response = get('/')
@@ -44,57 +59,43 @@ describe Application do
   end
   
   context "get to '/peep/new'" do
-    it "responds 200 OK" do
+    it "redirects to login if no session id" do
       response = get('/peep/new')
-      expect(response.status).to eq 200
+      expect(response.status).to eq 302
     end
-    it "displays a form to make a new peep" do
+    it "displays a form to make a new peep when logged in" do
+      post(
+        '/login',
+        handle: 'clara3',
+        password: 'password3'
+      )
       response = get('peep/new')
       expect(response.body).to include('<form action="/peep" method="POST">')
-      expect(response.body).to include('<input type="text" name="handle"')
       expect(response.body).to include('<input type="text" name="peep_content"')
       expect(response.body).to include('<input type="submit" value="Peep!"')
     end
   end
 
   context "post to '/peep'" do
-    xit "can make a new peep" do
+    it "can make a new peep" do
+      post(
+        '/login',
+        handle: 'clara3',
+        password: 'password3'
+      )
       response = post(
         '/peep',
-        handle: 'clara3',
         peep_content: 'this is a new test peep'
       )
-      time = double(:time)
-      allow(time).to receive(:time_now).and_return(Time.parse('2000-01-01 12:30'))
       expect(response.status).to eq 200
       expect(response.body).to include('Peep has been made!')
 
       expect(get('/').body).to include('this is a new test peep')
-      expect(get('/').body).to include('2000-01-01 at 12:30:00')
-    end
-    it "tests for valid arguments" do
-      response = post(
-        '/peep',
-        handle: 'garry',
-        peep_content: 'this is a new test peep'
-      )
-      expect(response.status).to be 400
-      expect(response.body).to eq ''
     end
     it "tests for special characters in content" do
       response = post(
         '/peep',
-        handle: 'clara3',
         peep_content: '<script> bad stuff </script>'
-      )
-      expect(response.status).to be 400
-      expect(response.body).to eq ''
-    end
-    it "tests for special characters in handle" do
-      response = post(
-        '/peep',
-        handle: '<script>',
-        peep_content: 'valid'
       )
       expect(response.status).to be 400
       expect(response.body).to eq ''

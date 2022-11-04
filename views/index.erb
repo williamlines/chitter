@@ -2,6 +2,8 @@
   <head></head>
     <body>
     <h1>Chitter</h1>
+      <h3>Logged in as <%=@session_user%></h3>
+      <h2><a href="/peep/new">New Peep</a></h2>
       <h2>Peeps:</h2>
         <div>
           <%@peeps.each do |peep|%>
@@ -13,5 +15,6 @@
             <%=peep.time.split(' ').join(' at ')%><br>
           <%end%>
         </div>
+        <h3><a href="/login">Log in</a></h3>
     </body>
 </html>

@@ -10,28 +10,19 @@ DatabaseConnection.connect('chitter_test')
 
 
 class Application < Sinatra::Base
-  # This allows the app code to refresh
-  # without having to restart the server.
+
+  enable :sessions
+
   configure :development do
     register Sinatra::Reloader
   end
 
-  def time_now(time = Time.parse('2000-01-01 12:30:00'))
+  def time_now(time = Time.now)
     return time.to_s.split(' ').first(2).join(' ')
   end
 
   def invalid_peep_params?
-    if UserRepository.new.find_by_handle(params[:handle]) == nil
-      return true
-    end 
-     
     params[:peep_content].each_char do |char|
-      if ['<', '>', '&', '%'].include?(char)
-        return true
-      end
-    end
-    
-    params[:handle].each_char do |char|
       if ['<', '>', '&', '%'].include?(char)
         return true
       end
@@ -39,16 +30,28 @@ class Application < Sinatra::Base
     return false 
   end
 
+  def session_user
+    if session[:user_id] == nil
+      return "none, log in?"
+    end
+    return UserRepository.new.find(session[:user_id]).handle
+  end
+
   get '/' do
     peep_repo = PeepRepository.new
     user_repo = UserRepository.new
+    @session_user = session_user
 
     @peeps = peep_repo.all.sort_by{|peep| Time.parse(peep.time)}.reverse
     return erb(:index)
   end
 
   get '/peep/new' do
-    return erb(:peep_new)
+    if session[:user_id] == nil
+      return redirect('/login')
+    else
+      return erb(:peep_new)
+    end
   end
 
   post '/peep' do
@@ -59,11 +62,9 @@ class Application < Sinatra::Base
     
     peep_repo = PeepRepository.new
     new_peep = Peep.new
-    
-    handle = params[:handle]
-    user_id = UserRepository.new.find_by_handle(handle).id
+
     new_peep.content = params[:peep_content]
-    new_peep.user_id = user_id
+    new_peep.user_id = session[:user_id]
     new_peep.time = time_now
 
     peep_repo.create(new_peep)
@@ -82,6 +83,7 @@ class Application < Sinatra::Base
     elsif BCrypt::Password.new(@user.password) != params[:password]
       return erb(:login_fail)
     else
+      session[:user_id] = @user.id
       return erb(:login_successful)
     end
   end
